@@ -14,45 +14,25 @@ import { Label, Todo } from "./Interfaces/todo.interface";
 import SortedTodoList from "./Components/specific/SortedTodoList";
 import Sidebar from "./Components/specific/Sidebar";
 import "./Assets/styles/App.css";
+import { useLabels } from "./Hooks/useLabels";
+import { useTodos } from "./Hooks/useTodos";
 
 const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [labels, setLabels] = useState<Label[]>([]);
   const [filterLabel, setFilterLabel] = useState<string>("");
   const [isLabelModalOpen, setIsLabelModalOpen] = useState<boolean>(false);
   const [showSortedTodos, setShowSortedTodos] = useState<boolean>(false);
   const [upcomingClicked, setUpcomingClicked] = useState<boolean>(false);
   const [, setSearchQuery] = useState<string>("");
-  const [todos, setTodos] = useState<Todo[]>([]);
 
-  useEffect(() => {
-    getLabels().then((response) => {
-      setLabels(response.data);
-    });
-  }, []);
-
-  useEffect(() => {
-    async function fetchTodos() {
-      try {
-        console.log("Fetching todos for label:", filterLabel);
-        const response = filterLabel
-          ? await getTodosByLabel(filterLabel)
-          : await getTodos();
-        setTodos(response.data); // Update todos state with fetched data
-      } catch (e) {
-        console.error("Error fetching todos", e);
-      }
-    }
-
-    fetchTodos();
-  }, [filterLabel]); // Depend on filterLabel for refetching todos
+  const { labels, addLabel, removeLabel } = useLabels();
+  const { todos } = useTodos(filterLabel);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
   const createNewLabel = async (name: string, color: string) => {
-    const response = await createLabel({ name, color });
-    setLabels([...labels, response.data]);
+    await addLabel(name, color);
     setIsLabelModalOpen(false);
   };
 
@@ -61,9 +41,7 @@ const App: React.FC = () => {
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
     event.stopPropagation();
-    await deleteLabel(id);
-    const updatedLabels = labels.filter((label) => label.id !== id);
-    setLabels(updatedLabels);
+    await removeLabel(id);
   };
 
   const handleUpcomingClick = () => {
