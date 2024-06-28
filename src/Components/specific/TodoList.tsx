@@ -8,36 +8,26 @@ import { Todo } from "../../Interfaces/todo.interface";
 
 interface TodoListProps {
   filterLabel: string;
-  onOpenCreateModal: () => void; // Add prop to handle opening create modal
+  onOpenCreateModal: () => void;
+  todos: Todo[];
 }
 
-export const TodoList: React.FC<TodoListProps> = ({ filterLabel, onOpenCreateModal }) => {
-  const [todos, setTodos] = useState<Todo[]>([]);
+export const TodoList: React.FC<TodoListProps> = ({
+  filterLabel,
+  onOpenCreateModal,
+  todos,
+}) => {
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  useEffect(() => {
-    fetchTodos();
-  }, [filterLabel]);
-
-  const fetchTodos = async () => {
-    try {
-      const response = filterLabel
-        ? await getTodosByLabel(filterLabel)
-        : await getTodos();
-      setTodos(response.data);
-    } catch (e) {
-      console.error("Error fetching todos", e);
-    }
-  };
-
   const handleDelete = async (id: string) => {
     try {
       await deleteTodo(id);
-      setTodos(todos.filter((todo) => todo.id !== id));
+      // Update todos after deletion if needed
     } catch (e) {
       console.error("Error deleting todo", e);
     }
@@ -50,8 +40,33 @@ export const TodoList: React.FC<TodoListProps> = ({ filterLabel, onOpenCreateMod
 
   const handleUpdateClose = () => {
     setSelectedTodo(null);
-    fetchTodos(); 
+    // Handle modal close and potential state update
   };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
+
+  // Filter todos based on search query and filter label
+  const filteredTodos = todos.filter((todo) =>
+    todo.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Function to fetch todos based on filter label
+  useEffect(() => {
+    async function fetchTodos() {
+      try {
+        const response = filterLabel
+          ? await getTodosByLabel(filterLabel)
+          : await getTodos();
+        // Update todos state with fetched data
+      } catch (e) {
+        console.error("Error fetching todos", e);
+      }
+    }
+
+    fetchTodos();
+  }, [filterLabel]); // Depend on filterLabel for refetching todos
 
   return (
     <div className="todo-list-container">
@@ -59,32 +74,47 @@ export const TodoList: React.FC<TodoListProps> = ({ filterLabel, onOpenCreateMod
         <div className="todo-item create-item" onClick={onOpenCreateModal}>
           <div className="create-plus">+</div>
         </div>
-        {todos.map((todo) => (
-          <div key={todo.id} className="todo-item" onClick={() => handleUpdateClick(todo)}>
-            <div className="todo-content">
-              <div className="todo-main">
-                <h2>{todo.title}</h2>
-                <p>{todo.description}</p>
-              </div>
-              <div className="todo-details">
-                <p>
-                  <strong>Due Date:</strong> {todo.dueDate}
-                </p>
-                <p>
-                  <strong>Reminder:</strong> {todo.reminder}
-                </p>
-                <p>
-                  <strong>Labels:</strong> {todo.labels.join(", ")}
-                </p>
-              </div>
-              <div className="todo-buttons">
-                <div className="todo-delete">
-                  <button onClick={(e) => { e.stopPropagation(); handleDelete(todo.id); }}>Delete</button>
+        {filteredTodos.length === 0 ? (
+          <p>No todos found.</p>
+        ) : (
+          filteredTodos.map((todo) => (
+            <div
+              key={todo.id}
+              className="todo-item"
+              onClick={() => handleUpdateClick(todo)}
+            >
+              <div className="todo-content">
+                <div className="todo-main">
+                  <h2>{todo.title}</h2>
+                  <p>{todo.description}</p>
+                </div>
+                <div className="todo-details">
+                  <p>
+                    <strong>Due Date:</strong> {todo.dueDate}
+                  </p>
+                  <p>
+                    <strong>Reminder:</strong> {todo.reminder}
+                  </p>
+                  <p>
+                    <strong>Labels:</strong> {todo.labels.join(", ")}
+                  </p>
+                </div>
+                <div className="todo-buttons">
+                  <div className="todo-delete">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(todo.id);
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
       {selectedTodo && (
         <Modal isOpen={isModalOpen} onClose={closeModal}>
