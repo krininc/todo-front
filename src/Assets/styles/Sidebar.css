@@ -1,0 +1,92 @@
+.sidebar {
+    width: 250px;
+    background-color: #f4f4f4;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden; 
+    box-sizing: border-box; 
+  }
+  
+  .sidebar-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
+  
+  .sidebar-header h2 {
+    margin: 0 0 10px 0;
+  }
+  
+  .search-bar {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  .sidebar-section {
+    margin-bottom: 20px;
+    flex-grow: 1;
+  }
+  
+  .sidebar-section h3 {
+    margin: 0 0 10px 0;
+  }
+  
+  .sidebar-section ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .sidebar-section ul li {
+    margin-bottom: 10px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+  
+  .sidebar-section ul li:hover {
+    background-color: #eaeaea;
+  }
+  
+  .tags .tag {
+    display: inline-block;
+    background-color: #e0e0e0;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-right: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .tags .tag:hover {
+    background-color: #d4d4d4;
+  }
+  
+  .sidebar-footer {
+    margin-top: auto; 
+    display: flex;
+    flex-direction: column;
+    gap: 10px; 
+    padding-bottom: 20px; 
+  }
+  
+  .sidebar-footer button {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #4caf50;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+  }
+  
+  .sidebar-footer button:hover {
+    background-color: #45a049;
+  }
+  
