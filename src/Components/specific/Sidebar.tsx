@@ -22,10 +22,10 @@ const Sidebar: React.FC<SidebarProps> = ({
   onCreateLabelClick,
   onLabelClick,
   onDeleteLabel,
-  onSearch, // Destructure onSearch prop
+  onSearch,
 }) => {
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onSearch(event.target.value); // Call onSearch when input changes
+    onSearch(event.target.value);
   };
 
   return (
@@ -37,7 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             type="text"
             className="search-bar"
             placeholder="Search by name..."
-            onChange={handleSearchChange} // Call handleSearchChange on change
+            onChange={handleSearchChange}
           />
         </div>
         <div className="sidebar-section">
@@ -62,7 +62,10 @@ const Sidebar: React.FC<SidebarProps> = ({
           <ul className="tags">
             <li
               className="tag"
-              onClick={() => onLabelClick("")}
+              onClick={() => {
+                console.log("Clicked: All Labels");
+                onLabelClick("");
+              }}
               style={{ cursor: "pointer" }}
             >
               All Labels
@@ -77,11 +80,19 @@ const Sidebar: React.FC<SidebarProps> = ({
                   justifyContent: "space-between",
                   alignItems: "center",
                 }}
+                onClick={() => {
+                  console.log(`Clicked label: ${label.name}`);
+                  onLabelClick(label.name);
+                }}
               >
-                <span onClick={() => onLabelClick(label.name)}>
-                  {label.name}
-                </span>
-                <button onClick={(event) => onDeleteLabel(label.id, event)}>
+                <span>{label.name}</span>
+                <button
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    console.log(`Delete clicked for label: ${label.name}`);
+                    onDeleteLabel(label.id, event);
+                  }}
+                >
                   Delete
                 </button>
               </li>

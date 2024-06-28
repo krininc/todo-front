@@ -22,7 +22,7 @@ const App: React.FC = () => {
   const [isLabelModalOpen, setIsLabelModalOpen] = useState<boolean>(false);
   const [showSortedTodos, setShowSortedTodos] = useState<boolean>(false);
   const [upcomingClicked, setUpcomingClicked] = useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [, setSearchQuery] = useState<string>("");
   const [todos, setTodos] = useState<Todo[]>([]);
 
   useEffect(() => {
@@ -34,6 +34,7 @@ const App: React.FC = () => {
   useEffect(() => {
     async function fetchTodos() {
       try {
+        console.log("Fetching todos for label:", filterLabel);
         const response = filterLabel
           ? await getTodosByLabel(filterLabel)
           : await getTodos();
@@ -81,7 +82,10 @@ const App: React.FC = () => {
         onUpcomingClick={handleUpcomingClick}
         labels={labels}
         onCreateLabelClick={() => setIsLabelModalOpen(true)}
-        onLabelClick={(label) => setFilterLabel(label)}
+        onLabelClick={(label) => {
+          console.log("Label clicked:", label);
+          setFilterLabel(label);
+        }}
         onDeleteLabel={handleDeleteLabel}
         onSearch={handleSearch}
       />
