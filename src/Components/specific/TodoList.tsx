@@ -8,18 +8,19 @@ import { Todo } from "../../Interfaces/todo.interface";
 
 interface TodoListProps {
   filterLabel: string;
+  searchQuery: string; // Add searchQuery prop
   onOpenCreateModal: () => void;
   todos: Todo[];
 }
 
 export const TodoList: React.FC<TodoListProps> = ({
   filterLabel,
+  searchQuery, // Use searchQuery prop
   onOpenCreateModal,
   todos,
 }) => {
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -41,10 +42,6 @@ export const TodoList: React.FC<TodoListProps> = ({
   const handleUpdateClose = () => {
     setSelectedTodo(null);
     // Handle modal close and potential state update
-  };
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
   };
 
   // Filter todos based on search query and filter label

@@ -3,14 +3,6 @@ import { TodoList } from "./Components/specific/TodoList";
 import Modal from "./Components/common/Modal";
 import CreateTodo from "./Components/specific/CreateToDo";
 import CreateLabelForm from "./Components/specific/CreateLabelForm";
-import {
-  getLabels,
-  createLabel,
-  deleteLabel,
-  getTodos,
-  getTodosByLabel,
-} from "./Services/Api/ToDo";
-import { Label, Todo } from "./Interfaces/todo.interface";
 import SortedTodoList from "./Components/specific/SortedTodoList";
 import Sidebar from "./Components/specific/Sidebar";
 import "./Assets/styles/App.css";
@@ -23,7 +15,8 @@ const App: React.FC = () => {
   const [isLabelModalOpen, setIsLabelModalOpen] = useState<boolean>(false);
   const [showSortedTodos, setShowSortedTodos] = useState<boolean>(false);
   const [upcomingClicked, setUpcomingClicked] = useState<boolean>(false);
-  const [, setSearchQuery] = useState<string>("");
+  const [activeLabel, setActiveLabel] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>(""); // Maintain search query state
 
   const { labels, addLabel, removeLabel } = useLabels();
   const { todos } = useTodos(filterLabel);
@@ -50,7 +43,7 @@ const App: React.FC = () => {
   };
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query);
+    setSearchQuery(query); // Update search query state
   };
 
   return (
@@ -63,9 +56,11 @@ const App: React.FC = () => {
         onLabelClick={(label) => {
           console.log("Label clicked:", label);
           setFilterLabel(label);
+          setActiveLabel(label); // Add this line
         }}
         onDeleteLabel={handleDeleteLabel}
-        onSearch={handleSearch}
+        onSearch={handleSearch} // Pass handleSearch to Sidebar
+        activeLabel={activeLabel} // Pass activeLabel prop
       />
       <div className="main-content">
         <header className="App-header">
@@ -77,6 +72,7 @@ const App: React.FC = () => {
           <TodoList
             todos={todos}
             filterLabel={filterLabel}
+            searchQuery={searchQuery} // Pass searchQuery to TodoList
             onOpenCreateModal={openModal}
           />
         )}
