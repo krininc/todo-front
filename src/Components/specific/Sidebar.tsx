@@ -12,8 +12,8 @@ interface SidebarProps {
     id: string,
     event: React.MouseEvent<HTMLButtonElement>
   ) => void;
-  onSearch: (query: string) => void; // Define onSearch prop
-  activeLabel: string; // Add activeLabel prop
+  onSearch: (query: string) => void; 
+  activeLabel: string;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -24,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onLabelClick,
   onDeleteLabel,
   onSearch,
-  activeLabel, // Add activeLabel prop
+  activeLabel,
 }) => {
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     onSearch(event.target.value);
@@ -63,7 +63,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           <h3>Labels</h3>
           <ul className="tags">
             <li
-              className={`tag ${"" === activeLabel ? 'active' : ''}`} // Add 'active' class conditionally
+              // Add 'active' class conditionally
+              className={`tag ${"" === activeLabel ? 'active' : ''}`} 
               onClick={() => {
                 console.log("Clicked: All Labels");
                 onLabelClick("");
@@ -75,7 +76,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             {labels.map((label) => (
               <li
                 key={label.id}
-                className={`tag ${label.name === activeLabel ? 'active' : ''}`} // Add 'active' class conditionally
+                // Add 'active' class conditionally
+                className={`tag ${label.name === activeLabel ? 'active' : ''}`} 
                 style={{
                   cursor: "pointer",
                   display: "flex",

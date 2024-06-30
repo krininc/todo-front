@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { TodoList } from "./Components/specific/TodoList";
 import Modal from "./Components/common/Modal";
 import CreateTodo from "./Components/specific/CreateToDo";
@@ -16,7 +16,7 @@ const App: React.FC = () => {
   const [showSortedTodos, setShowSortedTodos] = useState<boolean>(false);
   const [upcomingClicked, setUpcomingClicked] = useState<boolean>(false);
   const [activeLabel, setActiveLabel] = useState<string>("");
-  const [searchQuery, setSearchQuery] = useState<string>(""); // Maintain search query state
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const { labels, addLabel, removeLabel } = useLabels();
   const { todos } = useTodos(filterLabel);
@@ -43,7 +43,11 @@ const App: React.FC = () => {
   };
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query); // Update search query state
+    setSearchQuery(query);
+  };
+
+  const handleSortedTodoClose = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -54,25 +58,28 @@ const App: React.FC = () => {
         labels={labels}
         onCreateLabelClick={() => setIsLabelModalOpen(true)}
         onLabelClick={(label) => {
-          console.log("Label clicked:", label);
           setFilterLabel(label);
-          setActiveLabel(label); // Add this line
+          setActiveLabel(label);
         }}
         onDeleteLabel={handleDeleteLabel}
-        onSearch={handleSearch} // Pass handleSearch to Sidebar
-        activeLabel={activeLabel} // Pass activeLabel prop
+        onSearch={handleSearch}
+        activeLabel={activeLabel}
       />
       <div className="main-content">
         <header className="App-header">
           <h1>TODO List</h1>
         </header>
         {showSortedTodos ? (
-          <SortedTodoList onClose={() => setShowSortedTodos(false)} />
+          <SortedTodoList
+            onOpenCreateModal={openModal}
+            searchQuery={searchQuery}
+            onClose={handleSortedTodoClose}
+          />
         ) : (
           <TodoList
             todos={todos}
             filterLabel={filterLabel}
-            searchQuery={searchQuery} // Pass searchQuery to TodoList
+            searchQuery={searchQuery}
             onOpenCreateModal={openModal}
           />
         )}

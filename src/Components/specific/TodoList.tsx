@@ -3,7 +3,6 @@ import { deleteTodo, getTodos, getTodosByLabel } from "../../Services/Api/ToDo";
 import "../../Assets/styles/TodoList.css";
 import UpdateTodo from "./UpdateTodo";
 import Modal from "../common/Modal";
-import CreateTodo from "./CreateToDo";
 import { Todo } from "../../Interfaces/todo.interface";
 
 interface TodoListProps {
@@ -15,10 +14,11 @@ interface TodoListProps {
 
 export const TodoList: React.FC<TodoListProps> = ({
   filterLabel,
-  searchQuery, // Use searchQuery prop
+  searchQuery,
   onOpenCreateModal,
   todos,
 }) => {
+  
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
@@ -27,8 +27,8 @@ export const TodoList: React.FC<TodoListProps> = ({
 
   const handleDelete = async (id: string) => {
     try {
+      // delete endpoint from /services/api/todo
       await deleteTodo(id);
-      // Update todos after deletion if needed
     } catch (e) {
       console.error("Error deleting todo", e);
     }
@@ -41,7 +41,6 @@ export const TodoList: React.FC<TodoListProps> = ({
 
   const handleUpdateClose = () => {
     setSelectedTodo(null);
-    // Handle modal close and potential state update
   };
 
   // Filter todos based on search query and filter label
@@ -53,17 +52,18 @@ export const TodoList: React.FC<TodoListProps> = ({
   useEffect(() => {
     async function fetchTodos() {
       try {
-        const response = filterLabel
-          ? await getTodosByLabel(filterLabel)
-          : await getTodos();
-        // Update todos state with fetched data
+        if (filterLabel) {
+          await getTodosByLabel(filterLabel);
+        } else {
+          await getTodos();
+        }
       } catch (e) {
         console.error("Error fetching todos", e);
       }
     }
 
     fetchTodos();
-  }, [filterLabel]); // Depend on filterLabel for refetching todos
+  }, [filterLabel]);
 
   return (
     <div className="todo-list-container">
