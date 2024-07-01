@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { SketchPicker, BlockPicker } from "react-color";
 
 interface CreateLabelFormProps {
   onSubmit: (name: string, color: string) => void;
@@ -6,7 +7,7 @@ interface CreateLabelFormProps {
 
 const CreateLabelForm: React.FC<CreateLabelFormProps> = ({ onSubmit }) => {
   const [name, setName] = useState<string>("");
-  const [color, setColor] = useState<string>("");
+  const [color, setColor] = useState<string>("#fff");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,10 +28,9 @@ const CreateLabelForm: React.FC<CreateLabelFormProps> = ({ onSubmit }) => {
       </label>
       <label>
         Color:
-        <input
-          type="text"
-          value={color}
-          onChange={(e) => setColor(e.target.value)}
+        <SketchPicker
+          color={color}
+          onChangeComplete={(color) => setColor(color.hex)}
         />
       </label>
       <button type="submit">Create</button>

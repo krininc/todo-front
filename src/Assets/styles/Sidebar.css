@@ -9,6 +9,14 @@
     overflow: hidden; 
     box-sizing: border-box; 
   }
+  .sidebar .tags .tag.active {
+  background-color: #969494; 
+  color: black; 
+}
+.tag.active-label {
+  background-color: #999999;
+}
+
   
   .sidebar-header {
     display: flex;
@@ -51,6 +59,12 @@
   
   .sidebar-section ul li:hover {
     background-color: #eaeaea;
+  }
+
+  .tag.active {
+    background-color: white;
+    color: #4CAF50; 
+    border-radius: 5px; 
   }
   
   .tags .tag {

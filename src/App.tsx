@@ -1,158 +1,126 @@
-import React, { useState, useEffect } from "react";
-import Select from "react-select";
+import React, { useState } from "react";
 import { TodoList } from "./Components/specific/TodoList";
 import Modal from "./Components/common/Modal";
 import CreateTodo from "./Components/specific/CreateToDo";
 import CreateLabelForm from "./Components/specific/CreateLabelForm";
-import { getLabels, createLabel, deleteLabel, sortByReminder } from "./Services/Api/ToDo";
-import { Label } from "./Interfaces/todo.interface";
 import SortedTodoList from "./Components/specific/SortedTodoList";
 import Sidebar from "./Components/specific/Sidebar";
-import './Assets/styles/App.css';
+import "./Assets/styles/App.css";
+import { useLabels } from "./Hooks/useLabels";
+import { useTodos } from "./Hooks/useTodos";
+import TodayTodoList from "./Components/specific/TodayTodoList";
 
 const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [labels, setLabels] = useState<Label[]>([]);
   const [filterLabel, setFilterLabel] = useState<string>("");
   const [isLabelModalOpen, setIsLabelModalOpen] = useState<boolean>(false);
   const [showSortedTodos, setShowSortedTodos] = useState<boolean>(false);
   const [upcomingClicked, setUpcomingClicked] = useState<boolean>(false);
+  const [todayClicked, setTodayClicked] = useState<boolean>(false);
+  const [activeLabel, setActiveLabel] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
-  useEffect(() => {
-    getLabels().then((response) => {
-      setLabels(response.data);
-    });
-  }, []);
+  const { labels, addLabel, removeLabel } = useLabels();
+  const { todos } = useTodos(filterLabel);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  const handleLabelChange = (newValue: any) => {
-    if (newValue?.value === "new") {
-      setIsLabelModalOpen(true);
-    } else {
-      setFilterLabel(newValue ? newValue.value : "");
-    }
-  };
-
   const createNewLabel = async (name: string, color: string) => {
-    const response = await createLabel({ name, color });
-    setLabels([...labels, response.data]);
+    await addLabel(name, color);
     setIsLabelModalOpen(false);
   };
 
   const handleDeleteLabel = async (
     id: string,
-    event: React.MouseEvent<HTMLButtonElement>
+    event: React.MouseEvent<SVGSVGElement, MouseEvent>
   ) => {
     event.stopPropagation();
-    await deleteLabel(id);
-    const updatedLabels = labels.filter((label) => label.id !== id);
-    setLabels(updatedLabels);
-  };
-
-  const labelOptions = [
-    { value: "", label: "All Labels" },
-    ...labels.map((label) => ({
-      value: label.name,
-      label: (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <span>{label.name}</span>
-          <button onClick={(event) => handleDeleteLabel(label.id, event)}>
-            Delete
-          </button>
-        </div>
-      ),
-    })),
-    { value: "new", label: "Create New Label" },
-  ];
-
-  const customStyles = {
-    control: (provided: any) => ({
-      ...provided,
-      minHeight: "30px",
-      height: "40px",
-      fontSize: "12px",
-      width: "200px",
-    }),
-    valueContainer: (provided: any) => ({
-      ...provided,
-      height: "30px",
-      padding: "0 6px",
-    }),
-    input: (provided: any) => ({
-      ...provided,
-      margin: "0",
-      padding: "0",
-    }),
-    indicatorsContainer: (provided: any) => ({
-      ...provided,
-      height: "30px",
-    }),
-    indicatorSeparator: (provided: any) => ({
-      ...provided,
-      display: "none",
-    }),
-    dropdownIndicator: (provided: any) => ({
-      ...provided,
-      padding: "4px",
-    }),
-  };
-
-  const buttonAndSelectStyles = {
-    display: "flex",
-    width: "70rem",
-  };
-
-  const upcomingButtonStyles = {
-    height: "40px",
-    marginLeft: "2rem",
-    backgroundColor: upcomingClicked ? "#4CAF50" : "transparent",
-    color: upcomingClicked ? "white" : "black", 
-    border: "1px solid #ccc",
-    borderRadius: "4px",
-    padding: "0 1rem",
-    cursor: "pointer",
+    await removeLabel(id);
   };
 
   const handleUpcomingClick = () => {
-    setUpcomingClicked(!upcomingClicked);
-    setShowSortedTodos(!showSortedTodos);
+    if (!upcomingClicked) {
+      setUpcomingClicked(true);
+      setTodayClicked(false);
+      setShowSortedTodos(true);
+    }
+  };
+
+  const handleTodayClick = () => {
+    if (!todayClicked) {
+      setTodayClicked(true);
+      setUpcomingClicked(false);
+      setShowSortedTodos(false);
+    }
+  };
+
+  const handleStickyWallClick = () => {
+    setUpcomingClicked(false);
+    setTodayClicked(false);
+    setShowSortedTodos(false);
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const handleSortedTodoClose = () => {
+    setIsModalOpen(false);
   };
 
   return (
     <div className="App">
-      <Sidebar />
+      <Sidebar
+        upcomingClicked={upcomingClicked}
+        todayClicked={todayClicked}
+        onUpcomingClick={handleUpcomingClick}
+        onTodayClick={handleTodayClick}
+        onStickyWallClick={handleStickyWallClick}
+        labels={labels}
+        onCreateLabelClick={() => setIsLabelModalOpen(true)}
+        onLabelClick={(label) => {
+          setFilterLabel(label);
+          setActiveLabel(label);
+        }}
+        onDeleteLabel={handleDeleteLabel}
+        onSearch={handleSearch}
+        activeLabel={activeLabel}
+      />
       <div className="main-content">
         <header className="App-header">
           <h1>TODO List</h1>
-          <div style={buttonAndSelectStyles}>
-            <Select
-              styles={customStyles}
-              onChange={handleLabelChange}
-              options={labelOptions}
-            />
-            <button className="upcoming-button" style={upcomingButtonStyles} onClick={handleUpcomingClick}>
-              Upcoming
-            </button>
-          </div>
         </header>
         {showSortedTodos ? (
-          <SortedTodoList onClose={() => setShowSortedTodos(false)} />
+          <SortedTodoList
+            filterLabel={filterLabel}
+            onOpenCreateModal={openModal}
+            searchQuery={searchQuery}
+            onClose={handleSortedTodoClose}
+          />
+        ) : todayClicked ? (
+          <TodayTodoList
+            filterLabel={filterLabel}
+            onClose={handleSortedTodoClose}
+            onOpenCreateModal={openModal}
+            searchQuery={searchQuery}
+          />
         ) : (
-          <TodoList filterLabel={filterLabel} onOpenCreateModal={openModal} />
+          <TodoList
+            todos={todos}
+            filterLabel={filterLabel}
+            searchQuery={searchQuery}
+            onOpenCreateModal={openModal}
+          />
         )}
       </div>
       <Modal isOpen={isModalOpen} onClose={closeModal}>
         <CreateTodo onClose={closeModal} labels={labels} />
       </Modal>
-      <Modal isOpen={isLabelModalOpen} onClose={() => setIsLabelModalOpen(false)}>
+      <Modal
+        isOpen={isLabelModalOpen}
+        onClose={() => setIsLabelModalOpen(false)}
+      >
         <CreateLabelForm onSubmit={createNewLabel} />
       </Modal>
     </div>

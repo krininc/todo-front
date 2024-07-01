@@ -35,6 +35,7 @@ const CreateTodo: React.FC<CreateTodoProps> = ({ onClose, labels }) => {
     } catch (error) {
       console.error("Error creating TODO", error);
     }
+    window.location.reload();
   };
 
   const handleLabelChange = (
