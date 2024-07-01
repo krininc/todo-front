@@ -23,6 +23,7 @@ export const TodoList: React.FC<TodoListProps> = ({
   const [todos, setTodos] = useState<Todo[]>(initialTodos);
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [checkedItems, setCheckedItems] = useState<{ [key: string]: boolean}>({});
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -63,6 +64,10 @@ export const TodoList: React.FC<TodoListProps> = ({
   const handleUpdateClose = () => {
     setSelectedTodo(null);
   };
+
+  const handleCheckboxChange = (id: string, checked: boolean) => {
+    setCheckedItems({...checkedItems, [id]: checked });
+  }
 
   const filteredTodos = todos.filter((todo) =>
     todo.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -140,6 +145,15 @@ export const TodoList: React.FC<TodoListProps> = ({
               className="todo-item"
               onClick={() => handleUpdateClick(todo)}
             >
+              <input
+              type="checkbox"
+              className="todo-checkbox"
+              onClick={(e) => e.stopPropagation()}
+              onChange={(e) => {
+                e.stopPropagation();
+                handleCheckboxChange(todo.id, e.target.checked)}
+              }
+              />
               <div className="todo-content">
                 <div className="todo-main">
                   <h2>{todo.title}</h2>
