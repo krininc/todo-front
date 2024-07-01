@@ -8,6 +8,7 @@ import Sidebar from "./Components/specific/Sidebar";
 import "./Assets/styles/App.css";
 import { useLabels } from "./Hooks/useLabels";
 import { useTodos } from "./Hooks/useTodos";
+import TodayTodoList from "./Components/specific/TodayTodoList";
 
 const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -15,6 +16,7 @@ const App: React.FC = () => {
   const [isLabelModalOpen, setIsLabelModalOpen] = useState<boolean>(false);
   const [showSortedTodos, setShowSortedTodos] = useState<boolean>(false);
   const [upcomingClicked, setUpcomingClicked] = useState<boolean>(false);
+  const [todayClicked, setTodayClicked] = useState<boolean>(false);
   const [activeLabel, setActiveLabel] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -31,15 +33,32 @@ const App: React.FC = () => {
 
   const handleDeleteLabel = async (
     id: string,
-    event: React.MouseEvent<HTMLButtonElement>
+    event: React.MouseEvent<SVGSVGElement, MouseEvent>
   ) => {
     event.stopPropagation();
     await removeLabel(id);
   };
 
   const handleUpcomingClick = () => {
-    setUpcomingClicked(!upcomingClicked);
-    setShowSortedTodos(!showSortedTodos);
+    if (!upcomingClicked) {
+      setUpcomingClicked(true);
+      setTodayClicked(false);
+      setShowSortedTodos(true);
+    }
+  };
+
+  const handleTodayClick = () => {
+    if (!todayClicked) {
+      setTodayClicked(true);
+      setUpcomingClicked(false);
+      setShowSortedTodos(false);
+    }
+  };
+
+  const handleStickyWallClick = () => {
+    setUpcomingClicked(false);
+    setTodayClicked(false);
+    setShowSortedTodos(false);
   };
 
   const handleSearch = (query: string) => {
@@ -54,7 +73,10 @@ const App: React.FC = () => {
     <div className="App">
       <Sidebar
         upcomingClicked={upcomingClicked}
+        todayClicked={todayClicked}
         onUpcomingClick={handleUpcomingClick}
+        onTodayClick={handleTodayClick}
+        onStickyWallClick={handleStickyWallClick}
         labels={labels}
         onCreateLabelClick={() => setIsLabelModalOpen(true)}
         onLabelClick={(label) => {
@@ -71,9 +93,17 @@ const App: React.FC = () => {
         </header>
         {showSortedTodos ? (
           <SortedTodoList
+            filterLabel={filterLabel}
             onOpenCreateModal={openModal}
             searchQuery={searchQuery}
             onClose={handleSortedTodoClose}
+          />
+        ) : todayClicked ? (
+          <TodayTodoList
+            filterLabel={filterLabel}
+            onClose={handleSortedTodoClose}
+            onOpenCreateModal={openModal}
+            searchQuery={searchQuery}
           />
         ) : (
           <TodoList

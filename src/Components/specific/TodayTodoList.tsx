@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import {
-  sortByReminder,
   deleteTodo,
+  getTodayTodos,
   getTodosByLabel,
 } from "../../Services/Api/ToDo";
 import "../../Assets/styles/TodoList.css";
@@ -10,18 +10,18 @@ import UpdateTodo from "./UpdateTodo";
 import Modal from "../common/Modal";
 import { Todo } from "../../Interfaces/todo.interface";
 
-interface SortedTodoListProps {
+interface TodayTodoListInterface {
   filterLabel: string;
   onClose: () => void;
   onOpenCreateModal: () => void;
   searchQuery: string;
 }
 
-const SortedTodoList: React.FC<SortedTodoListProps> = ({
+const TodayTodoList: React.FC<TodayTodoListInterface> = ({
+  filterLabel,
   onClose,
   onOpenCreateModal,
   searchQuery,
-  filterLabel,
 }) => {
   const [sortedTodos, setSortedTodos] = useState<Todo[]>([]);
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
@@ -39,9 +39,17 @@ const SortedTodoList: React.FC<SortedTodoListProps> = ({
 
   const fetchSortedTodos = async () => {
     try {
-      const response = filterLabel
-        ? await getTodosByLabel(filterLabel)
-        : await sortByReminder();
+      let response;
+      if (filterLabel) {
+        const allLabelTodos = await getTodosByLabel(filterLabel);
+        response = {
+          data: allLabelTodos.data.filter((todo: Todo) =>
+            isToday(new Date(todo.dueDate))
+          ),
+        };
+      } else {
+        response = await getTodayTodos();
+      }
       setSortedTodos(response.data);
     } catch (error) {
       console.error("Error fetching sorted todos", error);
@@ -128,4 +136,13 @@ const SortedTodoList: React.FC<SortedTodoListProps> = ({
   );
 };
 
-export default SortedTodoList;
+const isToday = (date: Date) => {
+  const today = new Date();
+  return (
+    date.getDate() === today.getDate() &&
+    date.getMonth() === today.getMonth() &&
+    date.getFullYear() === today.getFullYear()
+  );
+};
+
+export default TodayTodoList;

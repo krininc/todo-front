@@ -9,6 +9,14 @@
     overflow: hidden; 
     box-sizing: border-box; 
   }
+  .sidebar .tags .tag.active {
+  background-color: #969494; 
+  color: black; 
+}
+.tag.active-label {
+  background-color: #999999;
+}
+
   
   .sidebar-header {
     display: flex;
